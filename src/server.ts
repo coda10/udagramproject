@@ -1,6 +1,7 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
+import { delay } from 'bluebird';
 
 (async () => {
 
@@ -28,12 +29,35 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   //   the filtered image file [!!TIP res.sendFile(filteredpath); might be useful]
 
   /**************************************************************************** */
+  app.get("/filteredimage", async ( req: Request, res: Response ) => {
+    try {
+          //Get image url
+          const { image_url }: any  = req.query;
+
+          //Filter Image
+          const filteredImage: String = await filterImageFromURL(image_url);
+          console.log("filteredImage: ", filteredImage);
+
+          //Respond with image
+          res.sendFile(`${filteredImage}`);
+
+          //Delay for 2 mins
+          await delay(2000);
+
+          //Delete file from server
+          await deleteLocalFiles([`${filteredImage}`]);
+          
+    } catch (error: any) {
+          // return if error
+          return res.status(404).send({ error });
+    }
+  } );
 
   //! END @TODO1
   
   // Root Endpoint
   // Displays a simple message to the user
-  app.get( "/", async ( req, res ) => {
+  app.get( "/", async ( req: Request, res: Response) => {
     res.send("try GET /filteredimage?image_url={{}}")
   } );
   
