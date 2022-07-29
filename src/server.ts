@@ -2,11 +2,16 @@ import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
 import { delay } from 'bluebird';
+import cors from 'cors';
 
 (async () => {
 
   // Init the Express application
   const app = express();
+
+  app.use(cors());
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: false }));
 
   // Set the network port
   const port = process.env.PORT || 8082;
